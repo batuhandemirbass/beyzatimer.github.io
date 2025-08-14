@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyza'nın İşten Ayrılışına Son</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate, move 20s infinite linear;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px white; }
+        }
+        
+        @keyframes move {
+            0% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(0px) translateX(-10px); }
+            75% { transform: translateY(20px) translateX(5px); }
+            100% { transform: translateY(0px) translateX(0px); }
+        }
+        
+        .container {
+            text-align: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .title {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #fff, #ffd700, #fff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .time-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 120px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .time-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .time-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+        
+        .message {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .timer {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .time-unit {
+                min-width: 80px;
+                padding: 15px;
+            }
+            
+            .time-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <!-- Arka plan müziği -->
+    <audio id="backgroundMusic" loop preload="auto" autoplay>
+        <!-- Fallout 4 benzeri atmosferik müzik için aşağıdaki linklerden birini kullanabilirsiniz -->
+        <!-- <source src="https://www.soundjay.com/misc/sounds-1/ambient-1.mp3" type="audio/mpeg"> -->
+        <!-- Veya YouTube'dan copyright-free ambient music linkini buraya ekleyebilirsiniz -->
+    </audio>
+    
+    <div class="container">
+        <h1 class="title">Beyza'nın İşten Ayrılışına Son</h1>
+        
+        <div class="timer">
+            <div class="time-unit">
+                <div class="time-number" id="days">00</div>
+                <div class="time-label">Gün</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-number" id="hours">00</div>
+                <div class="time-label">Saat</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-number" id="minutes">00</div>
+                <div class="time-label">Dakika</div>
+            </div>
+            <div class="time-unit">
+                <div class="time-number" id="seconds">00</div>
+                <div class="time-label">Saniye</div>
+            </div>
+        </div>
+        
+        <div class="message">
+            Loading...
+        </div>
+        
+        <!-- Müzik kontrol butonu -->
+        <div style="margin-top: 20px;">
+            <button id="musicToggle" style="
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 25px;
+                cursor: pointer;
+                backdrop-filter: blur(5px);
+                font-size: 0.9rem;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))'" 
+               onmouseout="this.style.background='linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))'">
+                🎵 Müziği Başlat
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Yıldızları oluştur
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Rastgele pozisyon
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                
+                // Rastgele boyut
+                const size = Math.random() * 3 + 1;
+                
+                // Rastgele animasyon gecikmesi
+                const delay = Math.random() * 2;
+                
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.animationDelay = delay + 's';
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Geri sayım fonksiyonu
+        function updateCountdown() {
+            // Hedef tarih: 15 Eylül 2025, 00:00:00
+            const targetDate = new Date('2025-09-15T00:00:00').getTime();
+            const now = new Date().getTime();
+            const timeLeft = targetDate - now;
+            
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            } else {
+                // Süre dolduğunda
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                
+                document.querySelector('.message').innerHTML = '🎉 Büyük gün geldi! İyi şanslar Beyza! 🎉';
+            }
+        }
+        
+        // Müzik kontrolleri
+        function setupMusicControls() {
+            const musicToggle = document.getElementById('musicToggle');
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            let isPlaying = false;
+            
+            musicToggle.addEventListener('click', function() {
+                if (isPlaying) {
+                    backgroundMusic.pause();
+                    musicToggle.innerHTML = '🎵 Müziği Başlat';
+                    isPlaying = false;
+                } else {
+                    // Gerçek bir müzik dosyası eklemek için aşağıdaki satırın yorumunu kaldırın
+                    // backgroundMusic.play().catch(e => console.log('Müzik çalanamadı:', e));
+                    
+                    // Şimdilik görsel geri bildirim
+                    musicToggle.innerHTML = '🔇 Müziği Durdur';
+                    isPlaying = true;
+                    
+                    // Eğer gerçek müzik dosyanız varsa bu satırı silin
+                    alert('Müzik özelliği aktif! Gerçek bir müzik dosyası eklemek için audio elementine src ekleyin.');
+                }
+            });
+        }
+        
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            createStars();
+            updateCountdown();
+            setupMusicControls();
+            
+            // Her saniye güncelle
+            setInterval(updateCountdown, 1000);
+        });
+    </script>
+</body>
+</html>
